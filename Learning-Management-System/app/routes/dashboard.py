@@ -1,0 +1,21 @@
+from flask import Blueprint, render_template
+from flask_login import login_required, current_user
+from app.models import Course, Enrollment
+
+dashboard_bp = Blueprint('dashboard', __name__)
+
+@dashboard_bp.route('/')
+@login_required # 🔒 Protects the route
+def index():
+    if current_user.role == 'instructor':
+        # Fetch courses created by THIS instructor
+        my_courses = Course.objects(instructor=current_user)
+        return render_template('dashboard_instructor.html', courses=my_courses)
+    
+    elif current_user.role == 'admin':
+        return "Admin Dashboard (Coming Soon)"
+        
+    else:
+        # Student: Fetch enrollments
+        enrollments = Enrollment.objects(student=current_user)
+        return render_template('dashboard_student.html', enrollments=enrollments)

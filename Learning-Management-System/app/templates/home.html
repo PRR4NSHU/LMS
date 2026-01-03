@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnHub - Master New Skills</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://source.unsplash.com/1600x900/?library,learning');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: #0d6efd;
+            margin-bottom: 15px;
+        }
+        .course-card {
+            transition: transform 0.3s;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-graduation-cap"></i> LearnHub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-danger text-white ms-2" href="{{ url_for('auth.logout') }}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-primary text-white ms-2" href="{{ url_for('auth.register') }}">Get Started</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <header class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Upgrade Your Skills Today</h1>
+            <p class="lead mb-4">Join our community of instructors and learners. Create courses, take quizzes, and track your progress.</p>
+            
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg px-5">Go to Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 me-2">Start Learning</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-5">Instructor Login</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <section class="container mt-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Explore Our Latest Courses</h2>
+            <p class="text-muted">Learn from the best instructors around the world.</p>
+        </div>
+
+        <div class="row">
+            {% for course in courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 course-card">
+                    <img src="https://source.unsplash.com/400x250/?coding,technology&sig={{ loop.index }}" class="card-img-top" alt="Course Image">
+                    
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ course.title }}</h5>
+                        
+                        <p class="card-text text-muted">
+                            {{ course.description | truncate(80) }}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-user"></i> {{ course.instructor.username }}
+                            </span>
+                            <small class="text-muted">
+                                {{ course.date_posted.strftime('%Y-%m-%d') }}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-0 pb-3">
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('courses.view_course', course_id=course.id) }}" class="btn btn-outline-primary w-100">View Details</a>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-dark w-100">Login to Enroll</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    <h4>No courses available right now!</h4>
+                    <p>Please check back later or ask an instructor to add one.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="container mt-5 pt-5 border-top">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <i class="fas fa-chalkboard-teacher feature-icon"></i>
+                <h3>Expert Instructors</h3>
+                <p>Create detailed courses with video lessons and text content easily.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fas fa-laptop-code feature-icon"></i>
+                <h3>Interactive Learning</h3>
+                <p>Access course materials anytime, anywhere, and track your progress.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fas fa-certificate feature-icon"></i>
+                <h3>Certified Skills</h3>
+                <p>Complete quizzes and earn recognition for your new skills.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p>&copy; 2024 LearnHub LMS. All Rights Reserved.</p>
+            <small>Built with Python Flask & MongoDB</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
