@@ -3,6 +3,7 @@ from flask_mongoengine import MongoEngine
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from config import Config
+from flask_mail import Mail
 
 # =======================
 # Extensions (GLOBAL)
@@ -10,6 +11,7 @@ from config import Config
 db = MongoEngine()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
+mail = Mail()
 
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "info"
@@ -26,6 +28,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
 
     # -----------------------
     # Register Blueprints

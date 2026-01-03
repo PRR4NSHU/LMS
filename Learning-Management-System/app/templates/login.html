@@ -1,21 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - LMS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to LearnHub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Live Animated Background (Floating Shapes) */
+        .live-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #3a7bd5, #3a6073);
+            z-index: -1;
+        }
+
+        .live-background li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+        }
+
+        .live-background li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .live-background li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .live-background li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .live-background li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .live-background li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        .live-background li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        .live-background li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .live-background li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .live-background li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .live-background li:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes animate {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+        }
+
+        .login-card {
+            /* Glassmorphism Effect */
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: transparent;
+            border-bottom: none;
+            padding-top: 30px;
+            text-align: center;
+        }
+
+        .card-header-custom h3 {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .card-header-custom p {
+            color: #777;
+        }
+
+        /* Input Fields Design */
+        .input-group-text {
+            background: #f8f9fa;
+            border-right: none;
+            color: #6c757d;
+        }
+
+        .form-control {
+            border-left: none;
+            box-shadow: none !important;
+            background: #f8f9fa;
+            padding: 12px;
+        }
+        
+        .form-control:focus {
+             background: #fff;
+             border-color: #ced4da;
+        }
+
+        .input-group:focus-within .input-group-text {
+            background: #fff;
+            border-color: #ced4da;
+            color: #3a7bd5; /* Icon color on focus */
+        }
+
+        /* Button Design */
+        .btn-success-custom {
+            background: linear-gradient(45deg, #3a7bd5, #3a6073);
+            border: none;
+            padding: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(58, 123, 213, 0.4);
+        }
+        
+        .register-link a {
+            color: #3a7bd5;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
+<body>
+    <ul class="live-background">
+        <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+    </ul>
+
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <h3 class="text-center mb-4">Login</h3>
+            <div class="col-lg-4 col-md-6">
+                <div class="card login-card">
+                    <div class="card-header-custom">
+                        <h3><i class="fas fa-sign-in-alt me-2"></i>Welcome Back</h3>
+                        <p class="mb-0">Login to continue your learning journey</p>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
                         
                         {% with messages = get_flashed_messages(with_categories=true) %}
                             {% if messages %}
                                 {% for category, message in messages %}
-                                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-4" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
                                 {% endfor %}
                             {% endif %}
                         {% endwith %}
@@ -23,30 +164,58 @@
                         <form method="POST" action="">
                             {{ form.hidden_tag() }}
                             
-                            <div class="mb-3">
-                                {{ form.email.label(class="form-label") }}
-                                {{ form.email(class="form-control") }}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    {% if form.email.errors %}
+                                        {{ form.email(class="form-control is-invalid", placeholder="name@example.com") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.email(class="form-control", placeholder="name@example.com") }}
+                                    {% endif %}
+                                </div>
                             </div>
                             
-                            <div class="mb-3">
-                                {{ form.password.label(class="form-label") }}
-                                {{ form.password(class="form-control") }}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    {% if form.password.errors %}
+                                        {{ form.password(class="form-control is-invalid", placeholder="Enter your password") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                                    {% endif %}
+                                </div>
                             </div>
                             
-                            <div class="mb-3 form-check">
-                                {{ form.remember(class="form-check-input") }}
-                                {{ form.remember.label(class="form-check-label") }}
-                            </div>
+                            <div class="mb-4 d-flex justify-content-between align-items-center">
+                                <div class="form-check">
+                                    {{ form.remember(class="form-check-input") }}
+                                    {{ form.remember.label(class="form-check-label text-muted") }}
+                                </div>
+                                    <a href="{{ url_for('auth.reset_request') }}" class="text-muted small text-decoration-none">Forgot Password?</a>                            
+                                </div>
                             
                             <div class="d-grid">
-                                {{ form.submit(class="btn btn-success") }}
+                                {{ form.submit(class="btn btn-success btn-success-custom btn-lg") }}
                             </div>
                         </form>
-                        <p class="mt-3 text-center">Need an account? <a href="{{ url_for('auth.register') }}">Register</a></p>
+                        
+                        <p class="mt-4 text-center register-link">
+                            Don't have an account? <a href="{{ url_for('auth.register') }}">Register Now</a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -45,3 +45,17 @@ class LessonForm(FlaskForm):
     title = StringField('Lesson Title', validators=[DataRequired()])
     content = TextAreaField('Content (Text or Video URL)', validators=[DataRequired()])
     submit = SubmitField('Add Lesson')
+    
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+    def validate_email(self, email):
+        user = User.objects(email=email.data).first()
+        if user is None:
+            raise ValidationError('There is no account with that email. You must register first.')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')

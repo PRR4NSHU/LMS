@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     # Secret Key bhi .env se lein (Security ke liye)
-    SECRET_KEY = os.getenv('SECRET_KEY') or 'dev-key-please-change'
+    SECRET_KEY = os.getenv('SECRET_KEY') 
     
     # MongoDB Config
     MONGODB_SETTINGS = {

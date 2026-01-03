@@ -42,14 +42,19 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                <ul class="navbar-nav ms-auto align-items-center"> {% if current_user.is_authenticated %}
+                        <li class="nav-item me-3">
+                            <span class="text-white fw-bold">
+                                <i class="fas fa-user-circle"></i> Welcome, {{ current_user.username }}
+                            </span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-danger text-white ms-2" href="{{ url_for('auth.logout') }}">Logout</a>
+                            <a class="nav-link active" href="{{ url_for('dashboard.index') }}">My Dashboard</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-danger text-white ms-2 btn-sm" href="{{ url_for('auth.logout') }}">Logout</a>
+                        </li>
+
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
@@ -58,11 +63,11 @@
                             <a class="nav-link btn btn-primary text-white ms-2" href="{{ url_for('auth.register') }}">Get Started</a>
                         </li>
                     {% endif %}
+                    
                 </ul>
             </div>
         </div>
     </nav>
-
     <div class="container mt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -75,6 +80,7 @@
             {% endif %}
         {% endwith %}
     </div>
+
     <header class="hero-section text-center">
         <div class="container">
             <h1 class="display-4 fw-bold">Upgrade Your Skills Today</h1>
