@@ -13,6 +13,7 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 mail = Mail()
 
+# Login settings
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "info"
 
@@ -33,6 +34,7 @@ def create_app(config_class=Config):
     # -----------------------
     # Register Blueprints
     # -----------------------
+    # Note: Circular import se bachne ke liye factory ke andar import kiya gaya hai
     from app.routes.auth import auth_bp
     from app.routes.course import course_bp
     from app.routes.dashboard import dashboard_bp
@@ -43,11 +45,6 @@ def create_app(config_class=Config):
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
     app.register_blueprint(main_bp)
 
-    # -----------------------
-    # Home Route
-    # -----------------------
-    @app.route("/")
-    def home():
-        return "<h1>LMS Project is Running! 🚀</h1><a href='/auth/login'>Login</a>"
+    # Note: "/" route humesha main_bp handle karega, yahan extra route ki zaroorat nahi hai.
 
     return app

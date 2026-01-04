@@ -1,0 +1,34 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8f9fa;
+    padding-top: 50px;
+}
+
+.course-form-card {
+    border: none;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* CKEditor Container Height Fix */
+.ck-editor__editable {
+    min-height: 250px;
+}
+
+.btn-success-custom {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+}

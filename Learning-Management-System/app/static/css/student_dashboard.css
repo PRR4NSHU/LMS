@@ -1,0 +1,71 @@
+/* Student Dashboard Custom Styles */
+.dashboard-container {
+    padding-top: 100px;
+    background-color: #f4f7fe;
+    min-height: 100vh;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+}
+
+/* 5x5 Grid Logic */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Ek row mein 5 cards */
+    gap: 20px;
+}
+
+/* Responsive Grid for Tablets and Mobile */
+@media (max-width: 1400px) { .course-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1100px) { .course-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 800px) { .course-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .course-grid { grid-template-columns: repeat(1, 1fr); } }
+
+.student-card {
+    background: white;
+    border-radius: 15px;
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.student-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.student-card img {
+    height: 120px;
+    object-fit: cover;
+}
+
+.progress-container {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 10px;
+}
+
+.course-title-sm {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    height: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

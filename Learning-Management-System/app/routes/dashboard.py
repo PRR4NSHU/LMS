@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, url_for
 from flask_login import login_required, current_user
 from app.models import Course, Enrollment
 
@@ -19,3 +19,12 @@ def index():
         # Student: Fetch enrollments
         enrollments = Enrollment.objects(student=current_user)
         return render_template('dashboard_student.html', enrollments=enrollments)
+    
+@dashboard_bp.route('/student')
+def student_index():
+    if current_user.role != 'student':
+        return redirect(url_for('dashboard.index')) # Agar instructor hai toh use instructor dashboard pe bhejo
+        
+    # Yahan Enrollment model se data uthayein (Agar Enrollment model hai toh)
+    # enrolled_courses = Enrollment.objects(student=current_user)
+    return render_template('student_dashboard.html')

@@ -54,6 +54,8 @@ class Course(db.Document):
     title = db.StringField(max_length=100, required=True)
     description = db.StringField(required=True)
     date_posted = db.DateTimeField(default=datetime.utcnow)
+    is_active = db.BooleanField(default=True)  # False hone par user ko nahi dikhega
+    is_hidden = db.BooleanField(default=False) # Instructor hide kar sakega
 
     # Instructor reference
     instructor = db.ReferenceField(User, reverse_delete_rule=db.CASCADE)

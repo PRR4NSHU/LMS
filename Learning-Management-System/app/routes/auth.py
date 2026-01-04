@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, url_for, flash, redirect, request,
 from app import bcrypt, mail
 from app.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm # Forms import kiye
 from app.models import User
-from flask_login import login_user, current_user, logout_user, login_required
+from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 
 auth_bp = Blueprint('auth', __name__)
