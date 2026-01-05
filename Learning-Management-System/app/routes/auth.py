@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
-from app import bcrypt, mail
-from app.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm # Forms import kiye
+from app import db, bcrypt, mail
+from app.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
@@ -12,6 +12,7 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
+    
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -22,8 +23,13 @@ def register():
             role=form.role.data
         )
         user.save()
-        flash('Your account has been created! You can now log in.', 'success')
-        return redirect(url_for('auth.login'))
+        
+        # 🔥 AUTO-LOGIN LOGIC: Register hote hi user ko login kar dein
+        login_user(user)
+        
+        flash(f'Account created successfully! Welcome to LearnHub, {user.username}!', 'success')
+        return redirect(url_for('main.home')) # Seedha Home page par redirection
+        
     return render_template('register.html', title='Register', form=form)
 
 # ---------------- LOGIN ROUTE ----------------
@@ -31,25 +37,30 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
+        
     form = LoginForm()
     if form.validate_on_submit():
         user = User.objects(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             flash(f'Welcome back, {user.username}!', 'success')
+            
+            # Security fix for next_page redirection
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+            if next_page and next_page.startswith('/'):
+                return redirect(next_page)
+            return redirect(url_for('main.home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
+            
     return render_template('login.html', title='Login', form=form)
 
 # ---------------- FORGOT PASSWORD LOGIC ----------------
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    # 👇 .env se MAIL_USERNAME ko sender banane ke liye current_app ka use kiya
     msg = Message('Password Reset Request - LearnHub',
-                  sender=current_app.config['MAIL_USERNAME'], 
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'], # Config se sender uthaya
                   recipients=[user.email])
     
     msg.body = f'''To reset your password, visit the following link:
@@ -68,7 +79,6 @@ def reset_request():
         user = User.objects(email=form.email.data).first()
         if user:
             send_reset_email(user)
-        # Security ke liye hum hamesha flash dikhate hain, chahe email mile ya na mile
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('auth.login'))
     return render_template('reset_request.html', title='Reset Password', form=form)
@@ -93,4 +103,5 @@ def reset_token(token):
 @auth_bp.route('/logout')
 def logout():
     logout_user()
+    flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login'))

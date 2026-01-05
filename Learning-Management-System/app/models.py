@@ -91,6 +91,8 @@ class Lesson(db.Document):
 class Enrollment(db.Document):
     student = db.ReferenceField(User, reverse_delete_rule=db.CASCADE)
     course = db.ReferenceField(Course, reverse_delete_rule=db.CASCADE)
+    student = db.ReferenceField('User')
+    course = db.ReferenceField('Course')
 
     date_enrolled = db.DateTimeField(default=datetime.utcnow)
     progress = db.IntField(default=0)  # 0–100
