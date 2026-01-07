@@ -12,7 +12,6 @@
     <style>
         :root {
             --primary: #6366f1;
-            --primary-hover: #4f46e5;
             --glass: rgba(255, 255, 255, 0.95);
         }
 
@@ -62,16 +61,6 @@
 
         .file-upload-wrapper:hover { border-color: var(--primary); background: #f1f5f9; }
 
-        .current-file-badge {
-            font-size: 0.75rem;
-            background: #e0e7ff;
-            color: #4338ca;
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 8px;
-        }
-
         .btn-submit {
             background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
             border: none; padding: 14px 40px; border-radius: 14px;
@@ -99,13 +88,13 @@
                 {% endif %}
             {% endwith %}
 
-            <div class="card upload-card p-4 p-md-5">
+            <div class="card upload-card p-4 p-md-5 mb-5">
                 <div class="text-center mb-5">
                     <div class="header-icon mx-auto mb-3">
                         <i class="fas fa-magic text-white fa-2x"></i>
                     </div>
                     <h2 class="fw-bold text-dark">{{ legend }}</h2>
-                    <p class="text-muted">High-quality content upload karke apne students ko inspire karein.</p>
+                    <p class="text-muted">Content update aur manage karein.</p>
                 </div>
 
                 <form method="POST" enctype="multipart/form-data">
@@ -115,53 +104,127 @@
                         {{ form.title.label(class="form-label") }}
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="fas fa-pen-nib text-muted"></i></span>
-                            {{ form.title(class="form-control border-start-0", placeholder="e.g. Python for Data Science 2026") }}
+                            {{ form.title(class="form-control border-start-0") }}
                         </div>
                     </div>
 
                     <div class="mb-4">
                         {{ form.description.label(class="form-label") }}
-                        {{ form.description(class="form-control", rows=4, placeholder="Is course mein students kya sikhenge?") }}
+                        {{ form.description(class="form-control", rows=4) }}
                     </div>
 
-                    <div class="row g-4 mb-5">
-                        <div class="col-md-6">
-                            <label class="form-label d-block"><i class="fas fa-video me-2 text-primary"></i>Intro Video</label>
-                            <div class="file-upload-wrapper">
-                                {{ form.video(class="form-control form-control-sm border-0 bg-transparent") }}
-                                {% if course and course.video_filename %}
-                                    <div class="current-file-badge">
-                                        <i class="fas fa-play me-1"></i> Active: {{ course.video_filename }}
-                                    </div>
-                                {% endif %}
-                            </div>
+                    <div class="mb-4">
+                        <label class="form-label">Course Price (in ₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-3 fw-bold text-success">₹</span>
+                            {{ form.price(class="form-control border-start-0", placeholder="0") }}
                         </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i> Set price to <strong>0</strong> to make this course <strong>Free</strong>.
+                        </div>
+                    </div>
+                    <div class="p-4 bg-light rounded-4 border mb-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-plus-circle me-2"></i>Add New Content (Optional)</h6>
+                        <p class="small text-muted mb-3">Niche file select karne se ek <strong>naya lesson</strong> add hoga. Purani files change nahi hongi.</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label d-block small text-muted">Upload Video</label>
+                                <div class="file-upload-wrapper bg-white">
+                                    {{ form.video(class="form-control form-control-sm border-0 bg-transparent") }}
+                                </div>
+                            </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label d-block"><i class="fas fa-file-pdf me-2 text-danger"></i>Resources</label>
-                            <div class="file-upload-wrapper">
-                                {{ form.resource_file(class="form-control form-control-sm border-0 bg-transparent") }}
-                                {% if course and course.resource_filename %}
-                                    <div class="current-file-badge">
-                                        <i class="fas fa-file-alt me-1"></i> Active: {{ course.resource_filename }}
-                                    </div>
-                                {% endif %}
+                            <div class="col-md-6">
+                                <label class="form-label d-block small text-muted">Upload Resource</label>
+                                <div class="file-upload-wrapper bg-white">
+                                    {{ form.resource_file(class="form-control form-control-sm border-0 bg-transparent") }}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-3 justify-content-center border-top pt-4">
                         <button type="submit" class="btn btn-submit shadow-sm px-5">
-                            <i class="fas fa-cloud-upload-alt me-2"></i>Uploads
+                            <i class="fas fa-save me-2"></i>Save Course
                         </button>
-                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-cancel bg-white">
+                        <a href="{{ url_for('courses.instructor_index') }}" class="btn btn-cancel bg-white text-decoration-none text-dark">
                             Cancel
                         </a>
                     </div>
                 </form>
             </div>
+
+            {% if course and course.lessons %}
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 py-3 rounded-top-4">
+                    <h5 class="fw-bold mb-0 text-dark ps-2"><i class="fas fa-edit me-2 text-warning"></i>Manage Existing Lessons</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush rounded-bottom-4">
+                        {% for lesson in course.lessons %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center p-3 border-light">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-light text-dark border me-3 rounded-pill">{{ loop.index }}</span>
+                                <div>
+                                    <span class="fw-bold d-block">{{ lesson.title }}</span>
+                                    <div class="small text-muted">
+                                        {% if lesson.video_filename %}<i class="fas fa-video text-success me-2"></i>{% endif %}
+                                        {% if lesson.resource_filename %}<i class="fas fa-file-pdf text-danger"></i>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editLessonModal{{ lesson.id }}">
+                                <i class="fas fa-pen me-1"></i> Edit
+                            </button>
+                        </div>
+
+                        <div class="modal fade" id="editLessonModal{{ lesson.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content rounded-4 border-0 shadow">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="modal-title fw-bold">Edit Lesson {{ loop.index }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{{ url_for('courses.update_lesson_details', lesson_id=lesson.id) }}" method="POST" enctype="multipart/form-data">
+                                        <div class="modal-body pt-4">
+                                            <div class="mb-3">
+                                                <label class="form-label small text-muted fw-bold">Lesson Title</label>
+                                                <input type="text" name="title" class="form-control bg-light" value="{{ lesson.title }}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small text-muted fw-bold">Replace Video (Optional)</label>
+                                                <input type="file" name="video" class="form-control form-control-sm" accept="video/*">
+                                                {% if lesson.video_filename %}
+                                                    <small class="text-success d-block mt-1"><i class="fas fa-check-circle me-1"></i>Current: {{ lesson.video_filename[:20] }}...</small>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small text-muted fw-bold">Replace Resource (Optional)</label>
+                                                <input type="file" name="resource" class="form-control form-control-sm" accept=".pdf,.docx,.txt">
+                                                {% if lesson.resource_filename %}
+                                                    <small class="text-danger d-block mt-1"><i class="fas fa-file-alt me-1"></i>Current: {{ lesson.resource_filename[:20] }}...</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary rounded-pill px-4">Update Lesson</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             
-            <div class="text-center mt-4">
+            <div class="text-center mt-5 mb-5">
                 <small class="text-muted"><i class="fas fa-shield-alt me-1"></i> Secure Instructor Panel v2.0</small>
             </div>
         </div>

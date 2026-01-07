@@ -1,54 +1,308 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{{ course.title }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.title }} | LearnHub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --dark-bg: #0f172a;
+        }
+
+        body {
+            background-color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .progress-header {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+        .progress { height: 10px; border-radius: 5px; background-color: #e2e8f0; }
+        .progress-bar { background: linear-gradient(90deg, #6366f1, #a855f7); border-radius: 5px; transition: width 0.5s ease; }
+
+        #certificateSection { display: none; }
+        .btn-certificate {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white; border: none; font-weight: 700;
+            border-radius: 12px; padding: 12px 25px; transition: 0.3s;
+            text-decoration: none; display: inline-flex; align-items: center;
+        }
+        .btn-certificate:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); color: white; }
+
+        .video-container {
+            background: #000; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            aspect-ratio: 16/9; margin-bottom: 30px;
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        .lesson-list {
+            background: white; border-radius: 20px; border: 1px solid #e2e8f0;
+            overflow: hidden; max-height: 500px; overflow-y: auto;
+        }
+
+        .lesson-item {
+            padding: 15px 20px; border-bottom: 1px solid #f1f5f9;
+            transition: 0.3s; cursor: pointer; display: flex;
+            align-items: center; justify-content: space-between;
+        }
+
+        .lesson-item:hover { background-color: #f8fafc; color: var(--primary); }
+        .lesson-item.active { background-color: #eef2ff; border-left: 4px solid var(--primary); color: var(--primary); }
+        
+        .status-icon { color: #cbd5e1; transition: 0.3s; }
+        .lesson-item.completed .status-icon { color: var(--success); }
+        .lesson-item.completed { background-color: #f0fdf4; }
+
+        .resource-card {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white; border-radius: 20px; padding: 25px; margin-top: 20px;
+        }
+
+        .btn-download { background: white; color: var(--primary); font-weight: 700; border-radius: 12px; transition: 0.3s; }
+        .btn-download:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        
+        .btn-complete { border-radius: 12px; padding: 12px 25px; font-weight: 700; transition: 0.3s; }
+
+        .lesson-meta { font-size: 0.75rem; color: #64748b; }
+    </style>
 </head>
-<body class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">{{ course.title }}</li>
-        </ol>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('dashboard.student_index') }}">
+                <i class="fas fa-arrow-left me-2"></i> Dashboard
+            </a>
+            <span class="navbar-text text-white d-none d-md-inline">{{ course.title }}</span>
+        </div>
     </nav>
 
-    <div class="row">
-        <div class="col-md-8">
-            <h1>{{ course.title }}</h1>
-            <p class="lead">{{ course.description }}</p>
-            <hr>
-            <h3>Lessons</h3>
-            <div class="list-group">
-                {% for lesson in lessons %}
-                    <div class="list-group-item">
-                        <h5>{{ lesson.title }}</h5>
-                        <p>{{ lesson.content }}</p>
+    <div class="container py-5">
+        <div class="progress-header shadow-sm">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold text-dark">Your Learning Progress</span>
+                        <span class="fw-bold text-primary" id="progressPercent">0%</span>
                     </div>
-                {% else %}
-                    <p>No lessons yet.</p>
-                {% endfor %}
-            </div>
-        </div>
-
-        {% if current_user == course.instructor %}
-        <div class="col-md-4">
-            <div class="card bg-light">
-                <div class="card-body">
-                    <h5>Add New Lesson</h5>
-                    <form method="POST">
-                        {{ form.hidden_tag() }}
-                        <div class="mb-2">
-                            {{ form.title(class="form-control", placeholder="Lesson Title") }}
-                        </div>
-                        <div class="mb-2">
-                            {{ form.content(class="form-control", placeholder="Content/URL", rows=2) }}
-                        </div>
-                        {{ form.submit(class="btn btn-primary btn-sm w-100") }}
-                    </form>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" id="mainProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="col-auto" id="certificateSection">
+                    <a href="{{ url_for('courses.get_certificate', course_id=course.id) }}" target="_blank" class="btn btn-certificate shadow-sm">
+                        <i class="fas fa-trophy me-2"></i> Get Certificate
+                    </a>
                 </div>
             </div>
         </div>
-        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="video-container" id="playerWrapper">
+                    {% if course.video_filename %}
+                    <video id="mainVideoPlayer" controls controlsList="nodownload">
+                        <source id="videoSource" src="{{ url_for('static', filename='uploads/videos/' + course.video_filename) }}" type="video/mp4">
+                    </video>
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100 text-white flex-column">
+                        <i class="fas fa-video-slash fa-3x mb-3 opacity-50"></i>
+                        <p>No Preview Available</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 id="activeTitle" class="fw-bold text-dark mb-1">{{ course.title }}</h2>
+                        <p id="activeContent" class="text-muted" style="white-space: pre-wrap;">{{ course.description }}</p>
+                    </div>
+                    <button id="completeBtn" class="btn btn-outline-success btn-complete shadow-sm ms-3" onclick="markAsCompleted()">
+                        <i class="fas fa-check-circle me-2"></i>Mark as Done
+                    </button>
+                </div>
+                <hr>
+            </div>
+
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-3">Course Curriculum</h5>
+                <div class="lesson-list shadow-sm" id="lessonList">
+                    
+                    <div class="lesson-item active" id="lesson-intro"
+                         onclick="changeContent('{{ url_for('static', filename='uploads/videos/' + (course.video_filename if course.video_filename else '')) }}', '{{ course.title }}', '{{ course.description }}', '{{ url_for('static', filename='uploads/resources/' + (course.resource_filename if course.resource_filename else '')) }}', 'intro', this)">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-play-circle me-3"></i>
+                            <div>
+                                <span class="small fw-bold d-block">0. Course Introduction</span>
+                                <span class="lesson-meta">Intro Video</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-check-circle status-icon"></i>
+                    </div>
+
+                    {% for lesson in lessons %}
+                    {% set is_done = lesson in user_progress.completed_lessons if user_progress else false %}
+                    <div class="lesson-item {{ 'completed' if is_done }}" id="lesson-{{ lesson.id }}"
+                         onclick="changeContent('{{ url_for('static', filename='uploads/videos/' + (lesson.video_filename if lesson.video_filename else '')) }}', '{{ lesson.title }}', '{{ lesson.content }}', '{{ url_for('static', filename='uploads/resources/' + (lesson.resource_filename if lesson.resource_filename else '')) }}', '{{ lesson.id }}', this)">
+                        <div class="d-flex align-items-center">
+                            <i class="far fa-play-circle me-3"></i>
+                            <div>
+                                <span class="small fw-bold d-block">{{ loop.index }}. {{ lesson.title }}</span>
+                                <span class="lesson-meta">Video Lesson</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-check-circle status-icon"></i>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div id="materialCard" class="resource-card shadow-sm">
+                    <h6><i class="fas fa-file-download me-2"></i>Study Material</h6>
+                    <p class="small opacity-75">Download resources for this lesson.</p>
+                    <a id="dynamicDownloadBtn" href="#" class="btn btn-download w-100 mt-2" download>Download Resources</a>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        let currentLessonId = 'intro';
+        // Use user ID to make storage unique per user on same device
+        const userId = "{{ current_user.id }}"; 
+
+        function changeContent(videoUrl, title, content, resourceUrl, lessonId, element) {
+            currentLessonId = lessonId;
+            document.querySelectorAll('.lesson-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            const wrapper = document.getElementById('playerWrapper');
+            let video = document.getElementById('mainVideoPlayer');
+            
+            // 1. Handle Video Player Changes
+            if (!videoUrl || videoUrl.includes('None') || videoUrl.endsWith('/')) {
+                wrapper.innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-white flex-column"><i class="fas fa-video-slash fa-3x mb-3 opacity-50"></i><p>No video for this lesson</p></div>`;
+            } else {
+                // Agar player exist nahi karta ya replace ho gaya tha, to wapis banao
+                if (!video) {
+                    wrapper.innerHTML = `<video id="mainVideoPlayer" controls controlsList="nodownload"><source id="videoSource" src="${videoUrl}" type="video/mp4"></video>`;
+                    video = document.getElementById('mainVideoPlayer'); // Re-select
+                } else {
+                    const source = document.getElementById('videoSource');
+                    source.src = videoUrl;
+                    video.load();
+                }
+                
+                // 🟢 NEW: Attach Resume Logic
+                setupVideoResume(video, lessonId);
+            }
+
+            // 2. Update Text Content
+            document.getElementById('activeTitle').innerText = title;
+            document.getElementById('activeContent').innerText = content;
+
+            // 3. Update Download Button
+            const downloadBtn = document.getElementById('dynamicDownloadBtn');
+            if (!resourceUrl || resourceUrl.includes('None') || resourceUrl.endsWith('/')) {
+                downloadBtn.classList.add('disabled');
+                downloadBtn.style.opacity = '0.5';
+                downloadBtn.href = "#";
+            } else {
+                downloadBtn.classList.remove('disabled');
+                downloadBtn.style.opacity = '1';
+                downloadBtn.href = resourceUrl;
+            }
+        }
+
+        // 🟢 FUNCTION: Video Resume Logic
+        function setupVideoResume(videoElement, lessonId) {
+            if(!videoElement) return;
+
+            // Unique key for this user and this lesson
+            const storageKey = `progress_${userId}_${lessonId}`;
+
+            // A. Load saved time when metadata loads (duration is known)
+            videoElement.onloadedmetadata = function() {
+                const savedTime = localStorage.getItem(storageKey);
+                if (savedTime) {
+                    videoElement.currentTime = parseFloat(savedTime);
+                }
+            };
+
+            // B. Save time every time it updates (playing)
+            videoElement.ontimeupdate = function() {
+                localStorage.setItem(storageKey, videoElement.currentTime);
+            };
+
+            // C. Clear progress if video ends (Optional: allows re-watching from start)
+            videoElement.onended = function() {
+                localStorage.removeItem(storageKey);
+                markAsCompleted(); // Auto-mark as done when video finishes
+            };
+        }
+
+        function markAsCompleted() {
+            if (!currentLessonId || currentLessonId === 'intro') {
+                document.getElementById('lesson-intro').classList.add('completed');
+                return;
+            }
+
+            fetch(`/courses/lesson/${currentLessonId}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById(`lesson-${currentLessonId}`).classList.add('completed');
+                    updateProgressBar(data.percent);
+                }
+            });
+        }
+
+        function updateProgressBar(percent) {
+            const bar = document.getElementById('mainProgressBar');
+            const text = document.getElementById('progressPercent');
+            const certSection = document.getElementById('certificateSection');
+            
+            bar.style.width = percent + '%';
+            text.innerText = percent + '%';
+
+            const isCertEnabled = "{{ course.certificate_enabled }}" === "True";
+
+            if (percent >= 100 && isCertEnabled) {
+                certSection.style.display = 'block';
+            } else {
+                certSection.style.display = 'none';
+            }
+        }
+
+        window.onload = function() {
+            // First time load: Setup video resume for the initial active lesson
+            const firstItem = document.querySelector('.lesson-item.active');
+            if(firstItem) {
+                // Manually trigger setup for the first loaded video
+                const video = document.getElementById('mainVideoPlayer');
+                // 'intro' is default ID if nothing else selected
+                setupVideoResume(video, 'intro'); 
+            }
+            
+            {% if enrollment %}
+                updateProgressBar({{ enrollment.progress }});
+            {% endif %}
+        };
+    </script>
 </body>
 </html>

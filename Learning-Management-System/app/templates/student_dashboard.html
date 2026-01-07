@@ -7,17 +7,105 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/student_dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .dashboard-container { padding-top: 100px; padding-bottom: 50px; }
+
+        /* General Card Styling */
+        .student-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .student-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+
+        /* Progress Bar */
+        .progress-container { background: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { 
+            background: linear-gradient(90deg, var(--primary), var(--secondary)); 
+            height: 100%; transition: width 0.5s ease;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white; padding: 40px; border-radius: 24px; margin-bottom: 40px;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* 🟢 Swiper Customization */
+        .swiper {
+            width: 100%;
+            padding-bottom: 50px !important; /* Spacing for pagination dots */
+            padding-top: 20px;
+            padding-left: 5px; /* Shadow kat na jaye */
+            padding-right: 5px;
+        }
+        
+        .swiper-slide {
+            height: auto; /* Ensure cards utilize full height */
+        }
+
+        .swiper-pagination-bullet-active {
+            background-color: var(--primary) !important;
+        }
+        
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--primary) !important;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .swiper-button-next:after, .swiper-button-prev:after {
+            font-size: 18px !important;
+            font-weight: bold;
+        }
+
+        /* Card Content inside Slider */
+        .card-img-placeholder {
+            height: 140px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 3rem;
+        }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark py-3">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/"><i class="fas fa-graduation-cap me-2 text-primary"></i>LearnHub</a>
             <div class="ms-auto d-flex align-items-center">
-                <span class="text-white me-3 d-none d-md-inline small">Welcome, {{ current_user.username }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+                <span class="text-white me-3 d-none d-md-inline small">Hi, {{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">Logout</a>
             </div>
         </div>
     </nav>
@@ -28,7 +116,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm rounded-4" role="alert">
                             {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -36,40 +124,47 @@
                 {% endif %}
             {% endwith %}
             
-            <div class="welcome-banner d-flex justify-content-between align-items-center" data-aos="fade-down">
+            <div class="welcome-banner d-flex justify-content-between align-items-center shadow" data-aos="fade-down">
                 <div>
                     <h2 class="fw-bold mb-1">Student Dashboard 👋</h2>
                     <p class="mb-0 opacity-75">Sikhne ki koi seema nahi hoti. Aaj kuch naya sikhein!</p>
                 </div>
-                <div class="d-none d-md-block">
-                    <i class="fas fa-rocket fa-4x opacity-25"></i>
-                </div>
+                <i class="fas fa-user-graduate fa-4x opacity-25 d-none d-md-block"></i>
             </div>
 
             <div class="mb-5">
-                <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-book-reader me-2 text-primary"></i>My Learning Path</h4>
+                <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-play-circle me-2 text-primary"></i>My Learning Path</h4>
                 <div class="course-grid">
                     {% for enrollment in enrolled_courses %}
                     {% set course = enrollment.course %}
-                    <div class="student-card shadow-sm" data-aos="zoom-in">
-                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=300&h=150&fit=crop" class="card-img-top" alt="course">
-                        <div class="card-body p-3">
-                            <h6 class="course-title-sm">{{ course.title }}</h6>
-                            <div class="d-flex justify-content-between small text-muted mb-1">
-                                <span>Progress</span>
-                                <span>{{ enrollment.progress }}%</span>
+                    <div class="student-card shadow-sm">
+                        <div class="p-4 d-flex flex-column h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-soft-primary text-primary" style="background: #eef2ff;">In Progress</span>
                             </div>
-                            <div class="progress-container mb-3">
-                                <div class="progress-bar-fill" style="width: {{ enrollment.progress }}%"></div>
+                            
+                            <h5 class="fw-bold mb-3">{{ course.title }}</h5>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Completion</span>
+                                    <span class="fw-bold">{{ enrollment.progress }}%</span>
+                                </div>
+                                <div class="progress-container mb-4">
+                                    <div class="progress-bar-fill" style="width: {{ enrollment.progress }}%"></div>
+                                </div>
+
+                                <a href="{{ url_for('courses.view_course', course_id=course.id) }}" class="btn btn-primary w-100 rounded-pill shadow-sm">
+                                    Continue Learning <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
                             </div>
-                            <a href="{{ url_for('courses.view_course', course_id=course.id) }}" class="btn btn-primary btn-sm w-100 rounded-pill">Continue Learning</a>
                         </div>
                     </div>
                     {% else %}
-                    <div class="col-12">
-                        <div class="alert alert-light border text-center py-4 shadow-sm">
-                            <i class="fas fa-info-circle text-muted mb-2 fa-lg"></i>
-                            <p class="text-muted mb-0">Aapne abhi tak kisi course mein enroll nahi kiya hai. Niche diye gaye courses check karein!</p>
+                    <div class="col-12 w-100">
+                        <div class="bg-white p-5 text-center rounded-4 border shadow-sm">
+                            <i class="fas fa-book-open fa-3x text-muted mb-3 opacity-50"></i>
+                            <p class="text-muted">You haven't enrolled in any courses yet.</p>
                         </div>
                     </div>
                     {% endfor %}
@@ -78,29 +173,60 @@
 
             <hr class="my-5 opacity-10">
 
-            <div class="mb-5">
-                <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-search-plus me-2 text-success"></i>Explore New Courses</h4>
-                <div class="course-grid">
-                    {% for course in available_courses %}
-                    <div class="student-card shadow-sm" style="border-top: 3px solid #6366f1;" data-aos="fade-up">
-                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=300&h=150&fit=crop" class="card-img-top" alt="explore">
-                        <div class="card-body p-3">
-                            <h6 class="course-title-sm">{{ course.title }}</h6>
-                            <p class="text-muted small mb-3"><i class="fas fa-user-tie me-1"></i> {{ course.instructor.username }}</p>
-                            
-                            <form action="{{ url_for('courses.enroll_course', course_id=course.id) }}" method="POST">
-                                <button type="submit" class="btn btn-success btn-sm w-100 rounded-pill shadow-sm">
-                                    <i class="fas fa-plus-circle me-1"></i> Enroll Now
-                                </button>
-                            </form>
+            <div class="mb-5" data-aos="fade-up">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-dark mb-0"><i class="fas fa-compass me-2 text-success"></i>Discover More</h4>
+                    <a href="{{ url_for('courses.explore') }}" class="text-decoration-none fw-bold small">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                        
+                        {% for course in available_courses %}
+                        <div class="swiper-slide">
+                            <div class="student-card shadow-sm h-100">
+                                <div class="card-img-placeholder">
+                                    <i class="fas fa-laptop-code"></i>
+                                </div>
+                                
+                                <div class="p-4 d-flex flex-column flex-grow-1">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <small class="text-muted"><i class="fas fa-user-tie me-1"></i> {{ course.instructor.username }}</small>
+                                        <span class="badge {{ 'bg-success' if course.price == 0 else 'bg-dark' }} rounded-pill">
+                                            {{ 'FREE' if course.price == 0 else '₹' ~ course.price }}
+                                        </span>
+                                    </div>
+
+                                    <h6 class="fw-bold mb-2 text-truncate" title="{{ course.title }}">{{ course.title }}</h6>
+                                    <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {{ course.description }}
+                                    </p>
+                                    
+                                    <div class="mt-auto">
+                                        <form action="{{ url_for('courses.enroll_course', course_id=course.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-outline-primary w-100 rounded-pill btn-sm fw-bold">
+                                                {% if course.price > 0 %}
+                                                    Buy Now
+                                                {% else %}
+                                                    Enroll Free
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        {% else %}
+                        <div class="col-12 text-center py-4 w-100">
+                            <p class="text-muted">No new courses available right now.</p>
+                        </div>
+                        {% endfor %}
+
                     </div>
-                    {% else %}
-                    <div class="col-12 text-center py-4 bg-white rounded shadow-sm border">
-                        <i class="fas fa-hourglass-half text-muted mb-2 fa-lg"></i>
-                        <p class="text-muted mb-0">Abhi koi naya course available nahi hai.</p>
-                    </div>
-                    {% endfor %}
+                    
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
                 </div>
             </div>
 
@@ -108,8 +234,41 @@
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <script>
         AOS.init({ duration: 800, once: true });
+
+        // 🟢 3. Initialize Swiper
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1,      // Mobile pe 1
+            spaceBetween: 25,      // Gap between cards
+            grabCursor: true,      // Hand cursor on hover
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                dynamicBullets: true,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2, // Tablet pe 2
+                    spaceBetween: 20,
+                },
+                768: {
+                    slidesPerView: 3, // Small Laptop pe 3
+                    spaceBetween: 25,
+                },
+                1024: {
+                    slidesPerView: 4, // Desktop pe 4 (Jaise aapne manga)
+                    spaceBetween: 30,
+                },
+            },
+        });
     </script>
 </body>
 </html>

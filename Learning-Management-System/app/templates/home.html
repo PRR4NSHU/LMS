@@ -23,6 +23,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('courses.explore') }}">Explore</a>
+                    </li>
+
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             {% if current_user.role == 'instructor' %}
@@ -67,7 +72,11 @@
     </header>
 
     <section id="courses" class="container py-5 mt-5">
-        <h2 class="fw-bold mb-5" data-aos="fade-right">Popular Courses</h2>
+        <div class="d-flex justify-content-between align-items-end mb-5" data-aos="fade-right">
+            <h2 class="fw-bold mb-0">Popular Courses</h2>
+            <a href="{{ url_for('courses.explore') }}" class="text-decoration-none fw-bold">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+
         <div class="row">
             {% for course in courses if course.is_active and not course.is_hidden %}
             <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
@@ -80,7 +89,14 @@
                         <p class="text-muted small mb-4">{{ course.description | truncate(80) }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="small fw-bold text-dark"><i class="fas fa-user-tie me-1 text-primary"></i> {{ course.instructor.username }}</span>
-                            <a href="{{ url_for('courses.view_course', course_id=course.id) }}" class="btn btn-sm btn-awesome px-3">Explore</a>
+                            
+                            <a href="{{ url_for('courses.view_course', course_id=course.id) }}" class="btn btn-sm btn-awesome px-3">
+                                {% if course.price > 0 %}
+                                    Buy ₹{{ course.price }}
+                                {% else %}
+                                    Explore
+                                {% endif %}
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -94,6 +110,12 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ url_for('courses.explore') }}" class="btn btn-outline-primary btn-lg rounded-pill px-5 fw-bold">
+                Explore All Courses
+            </a>
         </div>
     </section>
 

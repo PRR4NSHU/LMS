@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed # 🟢 Important Imports
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
+# 🟢 Fixed: Added 'NumberRange' to imports
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
 from app.models import User
 
 # ---------------- REGISTER FORM ----------------
@@ -38,9 +39,12 @@ class CourseForm(FlaskForm):
     title = StringField('Course Title', validators=[DataRequired(), Length(min=2, max=100)])
     description = TextAreaField('Description', validators=[DataRequired()])
     
+    # 🟢 Fixed: NumberRange ab upar import ho gaya hai
+    price = IntegerField('Price (in ₹)', default=0, validators=[NumberRange(min=0)])
+    
     # Video upload (Optional taaki edit ke waqt hamesha upload na karni pade)
     video = FileField('Upload Intro Video', 
-                      validators=[FileAllowed(['mp4', 'mov', 'avi'], 'Videos only!')])
+                      validators=[FileAllowed(['mp4', 'mov', 'avi', 'mkv'], 'Videos only!')])
     
     # Resource file (Optional)
     resource_file = FileField('Upload Course Material', 
@@ -51,7 +55,15 @@ class CourseForm(FlaskForm):
 # ---------------- LESSON FORM ----------------
 class LessonForm(FlaskForm):
     title = StringField('Lesson Title', validators=[DataRequired()])
-    content = TextAreaField('Content (Text or Video URL)', validators=[DataRequired()])
+    content = TextAreaField('Description/Content', validators=[DataRequired()])
+    
+    # Lesson specific uploads
+    video = FileField('Lesson Video', 
+                      validators=[FileAllowed(['mp4', 'mov', 'avi', 'mkv'], 'Videos only!')])
+    
+    resource_file = FileField('Lesson PDF/Material', 
+                              validators=[FileAllowed(['pdf', 'zip', 'docx', 'pptx'], 'Documents only!')])
+    
     submit = SubmitField('Add Lesson')
 
 # ---------------- PASSWORD RESET FORMS ----------------

@@ -22,6 +22,17 @@ class User(db.Document, UserMixin):
     email = db.StringField(max_length=120, required=True, unique=True)
     image_file = db.StringField(default="default.jpg")
     password = db.StringField(required=True)
+    signature_filename = db.StringField()
+    email_verification_code = db.StringField()
+    pending_new_email = db.StringField()
+    profile_pic = db.StringField()       # Profile Photo
+    qualification = db.StringField()     # Degree (e.g. M.Tech, PhD)
+    institution = db.StringField()       # College/Company (e.g. IIT Delhi)
+    
+    # 🟢 NEW: Social Links
+    linkedin_url = db.StringField()
+    twitter_url = db.StringField()
+    website_url = db.StringField()
 
     # Roles: student / instructor / admin
     role = db.StringField(default="student")
@@ -47,6 +58,13 @@ class User(db.Document, UserMixin):
         return User.objects(pk=user_id).first()
 
 
+class UserProgress(db.Document):
+    student = db.ReferenceField('User', required=True)
+    course = db.ReferenceField('Course', required=True)
+    completed_lessons = db.ListField(db.ReferenceField('Lesson')) # Finished lessons ki ID list
+    last_updated = db.DateTimeField(default=datetime.utcnow)
+
+
 # =======================
 # 2. COURSE DOCUMENT
 # =======================
@@ -59,6 +77,14 @@ class Course(db.Document):
 
     # Instructor reference
     instructor = db.ReferenceField(User, reverse_delete_rule=db.CASCADE)
+    # Database mein filenames save karne ke liye fields
+    video_filename = db.StringField()    
+    resource_filename = db.StringField() 
+    
+    is_active = db.BooleanField(default=True)
+    date_created = db.DateTimeField(default=datetime.utcnow)
+    certificate_enabled = db.BooleanField(default=False)
+    price = db.IntField(default=0)
 
     meta = {
         "collection": "courses"
@@ -76,6 +102,11 @@ class Lesson(db.Document):
     content = db.StringField(required=True)  # text or video URL
 
     course = db.ReferenceField(Course, reverse_delete_rule=db.CASCADE)
+    # 👇 Har lesson ki apni files
+    video_filename = db.StringField()
+    resource_filename = db.StringField()
+    
+    date_created = db.DateTimeField(default=datetime.utcnow)
 
     meta = {
         "collection": "lessons"
@@ -96,6 +127,9 @@ class Enrollment(db.Document):
 
     date_enrolled = db.DateTimeField(default=datetime.utcnow)
     progress = db.IntField(default=0)  # 0–100
+    amount_paid = db.IntField(default=0)
+    transaction_id = db.StringField()
+    payment_status = db.StringField(default='completed') # pending/completed
 
     meta = {
         "collection": "enrollments"
